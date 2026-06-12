@@ -15,12 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = app_pdo();
 
-            $stmt = $pdo->prepare(
-                'SELECT id, username, name, role, password_hash, partner_id, force_2fa_setup, twofa_enabled, forced_password_reset
-                 FROM users
-                 WHERE username = :username
-                 LIMIT 1'
-            );
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE username = :username LIMIT 1');
             $stmt->execute([':username' => $username]);
             $user = $stmt->fetch();
 

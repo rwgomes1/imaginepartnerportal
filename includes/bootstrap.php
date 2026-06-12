@@ -124,7 +124,7 @@ if (!function_exists('app_finish_login')) {
         $_SESSION['user_name'] = $user['name'] ?: $user['username'];
         $_SESSION['role'] = $user['role'];
 
-        if (!empty($user['partner_id'])) {
+        if (array_key_exists('partner_id', $user) && !empty($user['partner_id'])) {
             $_SESSION['partner_id'] = $user['partner_id'];
         }
 
