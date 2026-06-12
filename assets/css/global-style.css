@@ -1,0 +1,570 @@
+/* ==========================================================================
+   1) Global Resets & Base Styles
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Inter', Arial, sans-serif;
+  height: 100%;
+  background-color: #f5f7fa;
+  color: #333;
+    display: block !important; /* Remove forced flex behavior */
+    flex-direction: initial !important;
+}
+
+/* Container that grows to fill available space */
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  flex: 1;
+  padding: 20px;
+}
+
+/* ==========================================================================
+   2) Header
+   ========================================================================== */
+.header {
+  background: url('/assets/headers/header.png') no-repeat center;
+  background-size: cover;
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 20px;
+  position: relative;
+}
+
+.logo {
+  height: 60px;
+  margin-left: 20px;
+  margin-bottom: 50px;
+}
+
+.portal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-grow: 1;
+  text-align: left;
+  margin-bottom: 63px;
+  margin-left: 20px;
+}
+
+/* ==========================================================================
+   3) Navigation (Header Nav)
+   ========================================================================== */
+.nav {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  position: absolute;
+  bottom: 5px;
+  left: 20px;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 10px 15px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+/* ==========================================================================
+   4) Sidebar
+   ========================================================================== */
+.sidebar {
+  background-color: #011d3b;
+  width: 220px;
+  color: #fff;
+  float: left;
+  padding: 20px;
+  padding-bottom: 40px; /* so "Logged in as" appears above footer */
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-section.collapsible .submenu {
+  display: none;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.menu-section.collapsible.expanded .submenu {
+  display: block;
+}
+
+.menu-section.collapsible > span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  padding: 5px 0;
+}
+
+.menu-section.collapsible > span::after {
+  content: "▼";
+  font-size: 0.9rem;
+  transition: transform 0.3s;
+  margin-left: 5px;
+}
+
+.menu-section.collapsible.expanded > span::after {
+  transform: rotate(180deg);
+}
+
+.submenu li {
+  margin-bottom: 5px;
+}
+
+.submenu li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.submenu li a:hover {
+  text-decoration: underline;
+}
+
+.sidebar-menu li {
+  padding: 5px 15px;
+}
+
+.sidebar-footer {
+  margin-top: 20px;
+  border-top: 1px solid #444;
+  padding-top: 10px;
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   5) Footer
+   ========================================================================== */
+.footer {
+  background-color: #011d3b;
+  color: #ffffff;
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+  width: 100%;
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   6) Layout & Grid Helpers
+   ========================================================================== */
+.main-content {
+  display: block !important; /* Remove flex forcing misalignment */
+  flex-direction: row;
+  width: 85%;
+  max-width: 1400px;
+  margin-top: 40px;
+  justify-content: space-between;
+}
+
+.card-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+    gap: 20px !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+}
+
+/* ==========================================================================
+   7) Cards
+   ========================================================================== */
+.card {
+  background-color: #ffffff;
+  max-width: 90vw !important; /* Limit width for consistency */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin: auto !important;
+  text-align: center;
+  width: 100%;
+}
+
+.card h3 {
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  background-color: #0056b3;
+  color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* ==========================================================================
+   8) Buttons (Sitewide)
+   ========================================================================== */
+/* Outline button (default) */
+.button {
+  display: inline-block;
+  background-color: transparent;
+  color: #0056b3;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 2px solid #0056b3;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  max-width: 200px;
+  width: 100%;
+}
+
+/* Hover state becomes full color */
+.button:hover {
+  background-color: #0056b3;
+  color: #ffffff;
+}
+
+/* For buttons inside cards, ensure they are block-level and centered if needed */
+.card .button {
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Centered buttons in sections */
+.centered-cards .button {
+  display: block;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+/* ==========================================================================
+   9) Forms & Inputs
+   ========================================================================== */
+form label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="tel"],
+form select,
+form button {
+  width: 98%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Dropdown with arrow */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  color: #333;
+}
+
+.select-wrapper::after {
+  content: '▼';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #333;
+}
+
+.select-wrapper select:focus {
+  outline: none;
+  border-color: #0056b3;
+  box-shadow: 0 0 5px rgba(0,86,179,0.5);
+}
+
+/* ==========================================================================
+   10) Document / Upload Layout
+   ========================================================================== */
+.document-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.upload-card, .documents-card {
+  flex: 1;
+  min-width: 300px;
+}
+
+.documents-card table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.documents-card th, .documents-card td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.documents-card th {
+  background-color: #f5f7fa;
+  font-weight: bold;
+}
+
+.documents-card td input[type="checkbox"] {
+  margin-left: 10px;
+}
+
+/* ==========================================================================
+   11) Responsive Adjustments
+   ========================================================================== */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    height: auto;
+    padding: 15px;
+  }
+  .nav {
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    margin-top: 10px;
+  }
+  .container {
+    padding: 15px;
+  }
+  .footer {
+    padding: 10px;
+  }
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  .document-section {
+    flex-direction: column;
+  }
+  .main-content {
+    flex-direction: column;
+    width: 95%;
+  }
+}
+
+/* ==========================================================================
+   12) Index Page Specific Styles (Renamed from style2.css)
+   ========================================================================== */
+.index-main-content {
+  display: flex;
+  flex-direction: row;
+  width: 85%;
+  max-width: 1400px;
+  margin: 40px auto 0 auto;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+
+.index a,
+.index a:visited,
+.index a:hover,
+.index a:active {
+  color: #fff !important;
+  text-decoration: none !important;
+}
+
+.index-left-column {
+  flex: 2;
+  width: 70%;
+}
+
+.index-right-column {
+  flex: 1;
+  width: 30%;
+}
+
+.index-slider-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.index-slider-pointer {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+#index-range-slider {
+  width: 100%;
+}
+
+.index-pointer {
+  position: absolute;
+  top: -25px;
+  left: 0;
+  transform: translateX(-50%);
+  background-color: #003366;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.index-slider-panels {
+  display: flex;
+  flex-direction: column;
+}
+
+.index-slider-panel {
+  display: none;
+}
+
+.index-slider-panel.active {
+  display: block;
+}
+
+.index-slider-panel h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #003366;
+}
+
+.index-bubble {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #003366;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+}
+
+.index-bubble:hover {
+  background-color: #002244;
+}
+
+.index-content-area {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  height: 300px;
+}
+
+.index-partner-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding-bottom: 124px;
+}
+
+.index-partner-form h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #003366;
+  text-align: center;
+}
+
+.index-partner-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.index-partner-form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.index-partner-form button {
+  display: inline-block;
+  background-color: transparent;
+  color: #0056b3;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 2px solid #0056b3;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  max-width: 200px;
+  width: 100%;
+}
+
+.index-partner-form button:hover {
+  background-color: #002244;
+}
+
+@media (max-width: 768px) {
+  .index-main-content {
+    flex-direction: column;
+    width: 95%;
+    margin-top: 20px;
+  }
+  .index-left-column, .index-right-column {
+    width: 100% !important;
+  }
+  .index-content-area {
+    height: auto;
+  }
+}
