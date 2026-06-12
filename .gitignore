@@ -1,0 +1,21 @@
+# Dependencies
+vendor/
+
+# Uploads
+uploads/
+partners/resources/uploads/
+admin/resources/uploads/
+
+# Zip files
+*.zip
+
+# Environment & config
+.env
+config.local.php
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
