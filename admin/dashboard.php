@@ -35,7 +35,7 @@ $pageTitle = "Admin Dashboard";
 // ---------------------------------------------
 // Corporate Locations Weather
 // ---------------------------------------------
-$weather_api_key = '4164eb1a50a23a01230f8d561e3dc9fd'; // Your OpenWeatherMap API key
+$weather_api_key = OPENWEATHER_API_KEY;
 $locations = [
     [
         'name' => 'San Diego, CA',
@@ -65,11 +65,15 @@ foreach ($locations as $loc) {
     // Use imperial if you want Fahrenheit; use metric if you want Celsius
     $units = 'imperial'; // or 'metric'
     
-    $weather_url = "https://api.openweathermap.org/data/2.5/onecall?lat={$lat}&lon={$lon}&exclude=minutely,hourly,alerts&appid={$weather_api_key}&units={$units}";
-    
-    // Use @file_get_contents (or cURL if needed)
-    $weather_json = @file_get_contents($weather_url);
-    $weather_data = json_decode($weather_json, true);
+    if ($weather_api_key !== '') {
+        $weather_url = "https://api.openweathermap.org/data/2.5/onecall?lat={$lat}&lon={$lon}&exclude=minutely,hourly,alerts&appid={$weather_api_key}&units={$units}";
+
+        // Use @file_get_contents (or cURL if needed)
+        $weather_json = @file_get_contents($weather_url);
+        $weather_data = json_decode($weather_json, true);
+    } else {
+        $weather_data = null;
+    }
 
     $weatherResults[$loc['name']] = $weather_data;
 }

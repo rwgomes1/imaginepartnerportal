@@ -1,10 +1,7 @@
 <?php
 // /includes/sidebar.php
 
-// Make sure session is started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/bootstrap.php';
 
 // Optionally fetch or define $user_role, $user_name, etc.
 $user_role = $_SESSION['role'] ?? 'guest';
@@ -13,11 +10,11 @@ $user_name = $_SESSION['user_name'] ?? 'Guest';
 // If you need a pending partner count for admins/superadmins:
 $pendingCount = 0;
 try {
-    $pdo = new PDO(DB_DSN, DB_USER, DB_PASS);
+    $pdo = app_pdo();
     $stmt = $pdo->query("SELECT COUNT(*) AS pending_count 
                          FROM partners 
                          WHERE application_status = 'Pending Application'");
-    $pendingData = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pendingData = $stmt->fetch();
     $pendingCount = $pendingData ? $pendingData['pending_count'] : 0;
 } catch (PDOException $e) {
     // handle error or keep $pendingCount = 0
@@ -224,7 +221,7 @@ try {
     </ul>
 
     <div class="sidebar-footer">
-      Logged in as: <?php echo htmlspecialchars($user_name); ?><br>
+      Logged in as: <?php echo e($user_name); ?><br>
       <a href="/logout.php" style="color:#fff; text-decoration:underline; font-size:0.9rem;">Logout</a>
     </div>
   </nav>

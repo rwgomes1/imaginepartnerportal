@@ -1,87 +1,76 @@
 <?php
-session_start();
-require_once 'includes/config.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
+    $msg = 'If an account exists for that email, a reset link has been sent.';
 
-    try {
-        $pdo = new PDO(DB_DSN, DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-        // Find user by email
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
-        $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!app_verify_csrf($_POST['csrf_token'] ?? null)) {
+        $msg = 'Your session expired. Please try again.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $msg = 'Please enter a valid email address.';
+    } else {
+        try {
+            $pdo = app_pdo();
+            $stmt = $pdo->prepare('SELECT id, name, email FROM users WHERE email = :email LIMIT 1');
+            $stmt->execute([':email' => $email]);
+            $user = $stmt->fetch();
 
-        if ($user) {
-            // Generate token
-            $token = bin2hex(random_bytes(16));
-            // Store the token in the password_resets table
-            $resetStmt = $pdo->prepare("
-                INSERT INTO password_resets (user_id, reset_token, created_at)
-                VALUES (:uid, :token, NOW())
-                ON DUPLICATE KEY UPDATE reset_token = :token, created_at = NOW()
-            ");
-            $resetStmt->execute([
-                ':uid'  => $user['id'],
-                ':token'=> $token
-            ]);
+            if ($user) {
+                $token = bin2hex(random_bytes(16));
+                $resetStmt = $pdo->prepare(
+                    'INSERT INTO password_resets (user_id, reset_token, created_at)
+                     VALUES (:uid, :token, NOW())
+                     ON DUPLICATE KEY UPDATE reset_token = :token, created_at = NOW()'
+                );
+                $resetStmt->execute([
+                    ':uid' => $user['id'],
+                    ':token' => $token,
+                ]);
 
-            // Build reset link using your domain
-            $reset_link = "https://rd6.imagineteam.solutions/reset_password.php?token={$token}";
+                $resetLink = APP_URL . "/reset_password.php?token={$token}";
+                $tplStmt = $pdo->prepare("SELECT template_subject, template_body FROM email_templates WHERE template_key = 'forgot_password' LIMIT 1");
+                $tplStmt->execute();
+                $tpl = $tplStmt->fetch();
 
-            // Fetch the forgot_password template from email_templates
-            $tplStmt = $pdo->prepare("SELECT template_subject, template_body FROM email_templates WHERE template_key = 'forgot_password' LIMIT 1");
-            $tplStmt->execute();
-            $tpl = $tplStmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($tpl) {
-                // Replace placeholders: {user} and {reset_link}
-                $subject = str_replace(['{user}', '{reset_link}'], [$user['name'], $reset_link], $tpl['template_subject']);
-                $body    = str_replace(['{user}', '{reset_link}'], [$user['name'], $reset_link], $tpl['template_body']);
-
-                // Set proper From header using your domain
-                $headers = "From: No-Reply <no-reply@rd6.imagineteam.solutions>\r\n";
-                $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-                if (mail($email, $subject, $body, $headers)) {
-                    $msg = "Check your email for a reset link.";
+                if ($tpl) {
+                    $subject = str_replace(['{user}', '{reset_link}'], [$user['name'], $resetLink], $tpl['template_subject']);
+                    $body = str_replace(['{user}', '{reset_link}'], [$user['name'], $resetLink], $tpl['template_body']);
                 } else {
-                    $msg = "Failed to send email. Please try again later.";
+                    $subject = APP_NAME . ' password reset';
+                    $body = "Hello {$user['name']},\n\nUse this link to reset your password: {$resetLink}";
                 }
-            } else {
-                $msg = "Forgot Password template not found!";
+
+                $headers = "From: No-Reply <" . MAIL_FROM . ">\r\n";
+                $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+                mail($user['email'], $subject, $body, $headers);
             }
-        } else {
-            $msg = "No user found with that email.";
+        } catch (Throwable $exception) {
+            error_log('Forgot password error: ' . $exception->getMessage());
         }
-    } catch (PDOException $e) {
-        error_log('DB error: ' . $e->getMessage());
-        $msg = "DB error: " . $e->getMessage();
     }
 }
+
+$pageTitle = 'Forgot Password';
+include __DIR__ . '/includes/header.php';
+include __DIR__ . '/includes/sidebar.php';
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Forgot Password</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <?php include 'includes/header.php'; ?>
-    <?php include 'includes/sidebar.php'; ?>
-    <div class="container">
+<div class="container">
+    <div class="card">
         <h2>Forgot Password</h2>
-        <?php if (!empty($msg)): ?>
-            <p><?php echo htmlspecialchars($msg); ?></p>
+        <?php if ($msg !== ''): ?>
+            <p><?php echo e($msg); ?></p>
         <?php endif; ?>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo e(app_csrf_token()); ?>">
+
             <label for="email">Enter your email:</label>
-            <input type="email" name="email" required>
+            <input type="email" id="email" name="email" autocomplete="email" required>
+
             <button type="submit">Reset Password</button>
         </form>
     </div>
-    <?php include 'includes/footer.php'; ?>
-</body>
-</html>
+</div>
+<?php include __DIR__ . '/includes/footer.php'; ?>

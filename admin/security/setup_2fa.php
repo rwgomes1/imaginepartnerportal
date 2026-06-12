@@ -1,109 +1,91 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-session_start();
-require_once '../../includes/config.php';
-require_once '../../vendor/autoload.php';
-
 use OTPHP\TOTP;
 
-// Ensure the user is logged in
+require_once __DIR__ . '/../../includes/bootstrap.php';
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../../login.php');
     exit;
 }
 
-$pdo = new PDO(DB_DSN, DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$pdo = app_pdo();
 
-// Fetch current user from the database
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");
+$stmt = $pdo->prepare('SELECT * FROM users WHERE id = :id');
 $stmt->execute([':id' => $_SESSION['user_id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$user = $stmt->fetch();
 
-// If the user doesn't exist or already has 2FA enabled, redirect them
 if (!$user) {
     header('Location: ../../login.php');
     exit;
 }
-if ($user['twofa_enabled'] == 1) {
-    header('Location: ../../index.php'); // or your dashboard page
-    exit;
+
+if ((int) $user['twofa_enabled'] === 1) {
+    app_redirect_for_role($user['role']);
 }
 
-// If a temporary 2FA secret has not been generated for this session, create one
 if (empty($_SESSION['temp_2fa_secret'])) {
-    // Generate a TOTP secret using OT PHP
-    $tempTotp = TOTP::create();
-    $_SESSION['temp_2fa_secret'] = $tempTotp->getSecret();
+    $_SESSION['temp_2fa_secret'] = TOTP::create()->getSecret();
 }
-$secret = $_SESSION['temp_2fa_secret'];
 
-// Create the TOTP object using the secret
+$secret = $_SESSION['temp_2fa_secret'];
 $totp = TOTP::create($secret, 30, 'sha1', 6);
 $totp->setLabel($user['username']);
-$issuerName = "YourSiteName"; // Change this to your site’s name
-$totp->setIssuer($issuerName);
+$totp->setIssuer(APP_NAME);
 
-// Generate the provisioning URI for the TOTP (to be encoded in a QR code)
 $provisioningUri = $totp->getProvisioningUri();
-
-// Use a free QR code API to generate the QR image URL
 $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?data=' . urlencode($provisioningUri) . '&size=200x200';
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['otp_code'])) {
-    $otpCode = trim($_POST['otp_code']);
-    
-    // Verify the code using the TOTP object
-    if ($totp->verify($otpCode)) {
-        // Code is correct - update the user's record to enable 2FA
-        $updateStmt = $pdo->prepare("
-            UPDATE users 
-            SET twofa_enabled = 1, twofa_secret = :secret, force_2fa_setup = 0 
-            WHERE id = :id
-        ");
+    if (!app_verify_csrf($_POST['csrf_token'] ?? null)) {
+        $message = 'Your session expired. Please try again.';
+    } elseif ($totp->verify(trim($_POST['otp_code']))) {
+        $updateStmt = $pdo->prepare(
+            'UPDATE users
+             SET twofa_enabled = 1, twofa_secret = :secret, force_2fa_setup = 0
+             WHERE id = :id'
+        );
         $updateStmt->execute([
             ':secret' => $secret,
-            ':id'     => $user['id']
+            ':id' => $user['id'],
         ]);
-        // Clear the temporary secret from the session
+
         unset($_SESSION['temp_2fa_secret']);
-        header('Location: ../../index.php'); // Redirect to dashboard or homepage
-        exit;
+        app_finish_login($user);
+        if ((int) ($user['forced_password_reset'] ?? 0) === 1) {
+            header('Location: /reset_password.php');
+            exit;
+        }
+
+        app_redirect_for_role($user['role']);
     } else {
         $message = 'Invalid 2FA code. Please try again.';
     }
 }
+
+$pageTitle = 'Set Up Two-Factor Authentication';
+include __DIR__ . '/../../includes/header.php';
+include __DIR__ . '/../../includes/sidebar.php';
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Set Up Two-Factor Authentication</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
-</head>
-<body>
-<?php include '../../includes/header.php'; ?>
-<?php include '../../includes/sidebar.php'; ?>
-<main class="main-content">
-    <div class="container">
-        <div class="card">
-            <h2>Set Up Two-Factor Authentication</h2>
-            <?php if (!empty($message)): ?>
-                <p class="error-message"><?php echo htmlspecialchars($message); ?></p>
-            <?php endif; ?>
-            <p>Scan the QR code below with Google Authenticator (or a similar TOTP app), or enter the secret manually.</p>
-            <div style="text-align:center; margin:15px 0;">
-                <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code for 2FA">
-            </div>
-            <p style="text-align:center;">Secret: <strong><?php echo htmlspecialchars($secret); ?></strong></p>
-            <form method="POST">
-                <label for="otp_code">Enter 6-digit code:</label>
-                <input type="text" id="otp_code" name="otp_code" required style="padding:10px; border:1px solid #ccc; border-radius:4px;">
-                <button type="submit" class="button" style="margin-top:15px;">Verify</button>
-            </form>
+<div class="container">
+    <div class="card">
+        <h2>Set Up Two-Factor Authentication</h2>
+        <?php if ($message !== ''): ?>
+            <p class="error-message"><?php echo e($message); ?></p>
+        <?php endif; ?>
+        <p>Scan the QR code below with Google Authenticator or a similar TOTP app, or enter the secret manually.</p>
+        <div style="text-align:center; margin:15px 0;">
+            <img src="<?php echo e($qrCodeUrl); ?>" alt="QR Code for 2FA">
         </div>
+        <p style="text-align:center;">Secret: <strong><?php echo e($secret); ?></strong></p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo e(app_csrf_token()); ?>">
+
+            <label for="otp_code">Enter 6-digit code:</label>
+            <input type="text" id="otp_code" name="otp_code" inputmode="numeric" autocomplete="one-time-code" required style="padding:10px; border:1px solid #ccc; border-radius:4px;">
+
+            <button type="submit" class="button" style="margin-top:15px;">Verify</button>
+        </form>
     </div>
-</main>
-<?php include '../../includes/footer.php'; ?>
-</body>
-</html>
+</div>
+<?php include __DIR__ . '/../../includes/footer.php'; ?>

@@ -1,22 +1,19 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 // /includes/header.php
-// Start the session only if it has not been started already
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/bootstrap.php';
 
+$pageTitle = $pageTitle ?? APP_NAME;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Partner Portal</title>
+  <title><?php echo e($pageTitle); ?></title>
   <link rel="stylesheet" href="/assets/css/style.css">
+  <?php foreach (($pageStylesheets ?? []) as $stylesheet): ?>
+    <link rel="stylesheet" href="<?php echo e($stylesheet); ?>">
+  <?php endforeach; ?>
   <!-- <link rel="stylesheet" href="/assets/css/style2.css"> -->
   <style>
     /* Header styling with the original header image */
@@ -45,5 +42,5 @@ require_once __DIR__ . '/../vendor/autoload.php';
 <body>
 <header class="header">
   <img src="/assets/logo/logo@2x.webp" alt="Company Logo" class="logo">
-  <h1 class="portal-title">Partner Portal</h1>
+  <h1 class="portal-title"><?php echo e(APP_NAME); ?></h1>
 </header>

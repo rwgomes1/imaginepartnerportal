@@ -37,7 +37,7 @@ function setSetting(PDO $pdo, string $key, string $value): void {
 // Load existing settings from DB (or use defaults if not found)
 // -------------------------------------------------------------------
 $site_name         = getSetting($pdo, 'site_name', 'My Dev Site');
-$site_url          = getSetting($pdo, 'site_url', 'https://rd6.imagineteam.solutions'); // New field
+$site_url          = getSetting($pdo, 'site_url', APP_URL); // New field
 $send_mail         = getSetting($pdo, 'send_mail', 'yes'); // yes/no
 $disable_mass_mail = getSetting($pdo, 'disable_mass_mail', 'no'); // yes/no
 $from_email        = getSetting($pdo, 'from_email', 'webmaster@example.com');
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Reload variables from DB so the form shows updated values
         $site_name         = getSetting($pdo, 'site_name', 'My Dev Site');
-        $site_url          = getSetting($pdo, 'site_url', 'https://rd6.imagineteam.solutions');
+        $site_url          = getSetting($pdo, 'site_url', APP_URL);
         $send_mail         = getSetting($pdo, 'send_mail', 'yes');
         $disable_mass_mail = getSetting($pdo, 'disable_mass_mail', 'no');
         $from_email        = getSetting($pdo, 'from_email', 'webmaster@example.com');
