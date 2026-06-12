@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user && password_verify($password, $user['password_hash'])) {
                 session_regenerate_id(true);
 
-                if ((int) $user['force_2fa_setup'] === 1) {
+                if ((int) ($user['force_2fa_setup'] ?? 0) === 1) {
                     $_SESSION['user_id'] = (int) $user['id'];
                     $_SESSION['user_name'] = $user['name'] ?: $user['username'];
                     $_SESSION['role'] = $user['role'];
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit;
                 }
 
-                if ((int) $user['twofa_enabled'] === 1) {
+                if ((int) ($user['twofa_enabled'] ?? 0) === 1) {
                     $_SESSION['temp_user_id'] = (int) $user['id'];
                     $_SESSION['temp_user_role'] = $user['role'];
                     header('Location: /admin/security/2fa_verify.php');
@@ -39,8 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 app_log_firewall('LOGIN_SUCCESS', 'User logged in successfully', (int) $user['id']);
 
-                $updateStmt = $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = :id');
-                $updateStmt->execute([':id' => $user['id']]);
+                try {
+                    $updateStmt = $pdo->prepare('UPDATE users SET last_login = NOW() WHERE id = :id');
+                    $updateStmt->execute([':id' => $user['id']]);
+                } catch (PDOException $exception) {
+                    error_log('Unable to update last_login: ' . $exception->getMessage());
+                }
 
                 app_finish_login($user);
                 if ((int) ($user['forced_password_reset'] ?? 0) === 1) {
