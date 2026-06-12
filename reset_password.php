@@ -92,7 +92,7 @@ include __DIR__ . '/includes/sidebar.php';
                 <button type="submit">Reset Password</button>
             </form>
         <?php elseif ($success): ?>
-            <p style="text-align:center;"><a href="/login.php">Return to login</a></p>
+            <p class="auth-links"><a href="/login.php">Return to login</a></p>
         <?php endif; ?>
     </div>
 </div>

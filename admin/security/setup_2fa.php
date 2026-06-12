@@ -74,17 +74,17 @@ include __DIR__ . '/../../includes/sidebar.php';
             <p class="error-message"><?php echo e($message); ?></p>
         <?php endif; ?>
         <p>Scan the QR code below with Google Authenticator or a similar TOTP app, or enter the secret manually.</p>
-        <div style="text-align:center; margin:15px 0;">
+        <div class="auth-links">
             <img src="<?php echo e($qrCodeUrl); ?>" alt="QR Code for 2FA">
         </div>
-        <p style="text-align:center;">Secret: <strong><?php echo e($secret); ?></strong></p>
+        <p class="auth-links">Secret: <strong><?php echo e($secret); ?></strong></p>
         <form method="POST">
             <input type="hidden" name="csrf_token" value="<?php echo e(app_csrf_token()); ?>">
 
             <label for="otp_code">Enter 6-digit code:</label>
-            <input type="text" id="otp_code" name="otp_code" inputmode="numeric" autocomplete="one-time-code" required style="padding:10px; border:1px solid #ccc; border-radius:4px;">
+            <input type="text" id="otp_code" name="otp_code" inputmode="numeric" autocomplete="one-time-code" required>
 
-            <button type="submit" class="button" style="margin-top:15px;">Verify</button>
+            <button type="submit" class="button">Verify</button>
         </form>
     </div>
 </div>

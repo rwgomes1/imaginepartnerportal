@@ -89,9 +89,9 @@ include __DIR__ . '/includes/sidebar.php';
     </div>
 </div>
 
-<div style="margin-top:15px; text-align:center;">
-    <a href="forgot_username.php" style="color:#007bff; text-decoration:none;">Forgot Username</a> |
-    <a href="forgot_password.php" style="color:#007bff; text-decoration:none;">Forgot Password</a>
+<div class="auth-links">
+    <a href="forgot_username.php">Forgot Username</a> |
+    <a href="forgot_password.php">Forgot Password</a>
 </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

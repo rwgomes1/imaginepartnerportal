@@ -89,17 +89,17 @@ foreach ($locations as $loc) {
     </div>
     
     <!-- 3-Column Weather Card -->
-    <div class="card" style="margin-top:20px; border:1px solid #ccc; border-radius:5px; padding:15px; box-shadow: 2px 2px 8px rgba(0,0,0,0.1);">
-        <div class="card-header" style="font-weight:bold; margin-bottom:10px; font-size:1.2em;">
+    <div class="card weather-card">
+        <div class="card-header">
             Our Corporate Locations - Weather
         </div>
-        <div class="card-body" style="display:flex; justify-content:space-between;">
+        <div class="card-body weather-grid">
             <?php foreach ($locations as $loc): 
                 $locName = $loc['name'];
                 $data = $weatherResults[$locName];
             ?>
-            <div style="width:30%; border:1px solid #eee; border-radius:5px; padding:10px; box-sizing:border-box;">
-                <h4 style="margin-top:0;"><?php echo htmlspecialchars($locName); ?></h4>
+            <div class="weather-location">
+                <h4><?php echo htmlspecialchars($locName); ?></h4>
                 
                 <?php if ($data && isset($data['current'])): ?>
                     <!-- Current Weather -->
@@ -111,7 +111,7 @@ foreach ($locations as $loc) {
                     ?>
                     <p><strong>Current:</strong> <?php echo $currDesc; ?> - <?php echo $currTemp; ?>°</p>
                     
-                    <hr style="border:none; border-top:1px solid #eee; margin:10px 0;">
+                    <hr>
                     
                     <!-- 2-Day Forecast -->
                     <h5>2-Day Forecast</h5>
@@ -128,7 +128,7 @@ foreach ($locations as $loc) {
                             $dayDesc = ucfirst($day['weather'][0]['description']);
                             $dayDate = date('Y-m-d', $day['dt']);
                     ?>
-                        <p style="margin-bottom:5px;">
+                        <p>
                             <strong><?php echo $dayDate; ?>:</strong>
                             <?php echo $dayDesc; ?>, <?php echo $dayTemp; ?>°
                         </p>

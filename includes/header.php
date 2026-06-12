@@ -14,33 +14,16 @@ $pageTitle = $pageTitle ?? APP_NAME;
   <?php foreach (($pageStylesheets ?? []) as $stylesheet): ?>
     <link rel="stylesheet" href="<?php echo e($stylesheet); ?>">
   <?php endforeach; ?>
-  <!-- <link rel="stylesheet" href="/assets/css/style2.css"> -->
-  <style>
-    /* Header styling with the original header image */
-    .header {
-      background: url('/assets/headers/header.png') no-repeat center;
-      background-size: cover;
-      height: 150px;
-      display: flex;
-      align-items: flex-end;
-      padding: 20px;
-    }
-    .header .logo {
-      height: 60px;
-      margin-right: 20px;
-    }
-    .header .portal-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #ffffff;
-      flex-grow: 1;
-      text-align: left;
-      margin-bottom: 61px;
-    }
-  </style>
 </head>
 <body>
 <header class="header">
-  <img src="/assets/logo/logo@2x.webp" alt="Company Logo" class="logo">
-  <h1 class="portal-title"><?php echo e(APP_NAME); ?></h1>
+  <div class="header-inner">
+    <a class="header-logo" href="/index.php" aria-label="<?php echo e(APP_NAME); ?> home">
+      <img src="/assets/logo/logo@2x.webp" alt="ImagineSoftware">
+    </a>
+    <div class="header-copy">
+      <span class="header-kicker">Partner Ecosystem</span>
+      <h1 class="portal-title"><?php echo e(APP_NAME); ?></h1>
+    </div>
+  </div>
 </header>

@@ -1,6 +1,5 @@
 <?php
-session_start();
-require_once 'includes/config.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 // If coming from the index application, prefill values from session
 $prefill_company_name       = $_SESSION['app_company_name'] ?? '';
@@ -8,17 +7,12 @@ $prefill_main_contact       = $_SESSION['app_main_contact'] ?? '';
 $prefill_company_phone      = $_SESSION['app_company_phone'] ?? '';
 $prefill_main_contact_email = $_SESSION['app_main_contact_email'] ?? '';
 
-// Generate CSRF token if not set
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF check
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    if (!app_verify_csrf($_POST['csrf_token'] ?? null)) {
         die("Invalid CSRF token");
     }
     
@@ -40,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $technical_contact_phone_number = htmlspecialchars(trim($_POST['technical_contact_phone_number']));
     
     try {
-        $pdo = new PDO(DB_DSN, DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $pdo = app_pdo();
         // Insert new partner record with status set to "Pending Application"
         $stmt = $pdo->prepare(
             'INSERT INTO partners (
@@ -80,111 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Error: " . $e->getMessage();
     }
 }
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Partner Application</title>
-    <link rel="stylesheet" href="assets/css/style.css"> <!-- or your main CSS file -->
-    <style>
-        body {
-            background: #f5f7fa;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        .card {
-            padding: 30px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .card h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-            font-weight: 600;
-        }
-        .success-message {
-            color: green;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .error-message {
-            color: red;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        /* Two-column form styling */
-        .two-column-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 20px; /* spacing between columns */
-        }
-        .form-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-align: left;
-            color: #444;
-            font-size: 0.95rem;
-        }
-        .form-group input,
-        .form-group select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            color: #333;
-        }
-        /* Make headings for sub-sections stand out */
-        .sub-section-title {
-            font-size: 1.05rem;
-            margin-bottom: 5px;
-            color: #333;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 5px;
-            font-weight: 600;
-        }
-        /* Full-width for the submit button row */
-        .full-width {
-            grid-column: 1 / 3;
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        button[type="submit"] {
-            padding: 12px 30px;
-            background: #0056b3;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button[type="submit"]:hover {
-            background: #003f8c;
-        }
-    </style>
-</head>
-<body>
-    <?php include 'includes/header.php'; ?>
 
+$pageTitle = 'Partner Application';
+include __DIR__ . '/includes/header.php';
+?>
     <div class="container">
         <div class="card">
             <h2>Create Partner Application</h2>
@@ -195,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="POST" class="two-column-form">
-                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                <input type="hidden" name="csrf_token" value="<?php echo e(app_csrf_token()); ?>">
 
                 <!-- Column 1 Section -->
                 <div class="form-section">
@@ -302,6 +195,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
         </div>
     </div>
-    <?php include 'includes/footer.php'; ?>
-</body>
-</html>
+    <?php include __DIR__ . '/includes/footer.php'; ?>

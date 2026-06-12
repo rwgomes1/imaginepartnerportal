@@ -1,142 +1,57 @@
-/* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Public partner application experience */
+body > .main-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.58fr);
+    gap: 24px;
+    width: min(1240px, calc(100% - 48px));
+    margin: 32px auto 56px;
+    align-items: start;
 }
 
-/* Body Styling */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    min-height: 100vh;
-}
-
-/* Header */
-.header {
-    background: url('/assets/headers/header.png') no-repeat center;
-    background-size: cover;
-    width: 100%;
-    height: 120px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-}
-
-/* Logo Fix */
-.logo {
-    height: 60px;
-    margin-left: 20px;
-}
-
-/* Portal Title */
-.portal-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffffff;
-    text-align: left;
-    margin-left: 20px;
-}
-
-/* Navigation Fix */
-.nav {
-    position: absolute;
-    bottom: 5px;
-    left: 20px;
-    display: flex;
-    gap: 15px;
-}
-
-.nav-link {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.nav-link:hover {
-    text-decoration: underline;
-}
-
-/* Footer Fix */
-.footer {
-    background-color: #00274d;
-    color: #ffffff;
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: 400;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-/* Main Content Layout */
-.main-content {
-    display: flex;
-    flex-direction: row;
-    width: 85%;
-    max-width: 1400px;
-    margin-top: 40px;
-    justify-content: space-between;
-}
-
-/* Left Column Fix */
-.left-column {
-    flex: 2;
-    width: 70%;
-    margin-right: 20px;
-}
-
-/* Right Column Fix */
+.left-column,
 .partner-form-container {
-    flex: 1;
-    width: 30%;
+    min-width: 0;
 }
 
-/* Slider Container Fix */
+.slider-container,
+.content-area,
+.partner-form {
+    padding: 24px;
+}
+
 .slider-container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
 
-/* Slider Pointer Fix */
 .slider-pointer {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    padding: 16px 0 6px;
 }
 
 #range-slider {
     width: 100%;
+    accent-color: var(--color-cyan);
 }
 
 .pointer {
     position: absolute;
-    top: -25px;
+    top: -6px;
     left: 0;
-    transform: translateX(-50%);
-    background-color: #003366;
+    min-width: 38px;
+    padding: 4px 8px;
     color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: bold;
+    background: var(--color-navy-2);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-align: center;
+    transform: translateX(-50%);
 }
 
-/* Slider Panels Fix */
 .slider-panels {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    gap: 12px;
 }
 
 .slider-panel {
@@ -144,119 +59,85 @@ body {
 }
 
 .slider-panel.active {
-    display: block;
+    display: grid;
+    gap: 10px;
 }
 
 .slider-panel h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: #003366;
+    margin-bottom: 2px;
+    color: var(--color-navy);
+    font-size: 1.15rem;
 }
 
 .bubble {
-    display: block;
+    justify-content: flex-start;
     width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    background-color: #003366;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    min-height: 46px;
+    padding: 12px 14px;
+    color: var(--color-ink);
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-cyan);
+    box-shadow: none;
     text-align: left;
-    font-size: 16px;
 }
 
 .bubble:hover {
-    background-color: #002244;
+    color: var(--color-ink);
+    background: #eef9fc;
+    border-color: #b8e6f2;
+    border-left-color: var(--color-green);
+    box-shadow: none;
 }
 
-/* Content Area Fix */
 .content-area {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 300px;
+    min-height: 250px;
+    color: var(--color-muted);
+    border-left: 4px solid var(--color-green);
 }
 
-.content-area h1 {
-    font-size: 22px;
-    margin-bottom: 10px;
-    color: #003366;
+.content-area h1,
+.content-area h2 {
+    color: var(--color-navy);
 }
 
 .content-area p {
-    font-size: 16px;
-    line-height: 1.5;
+    margin-bottom: 0;
 }
 
-/* Partner Form Fix */
 .partner-form {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 562px;
+    position: sticky;
+    top: 24px;
+    box-shadow: var(--shadow-md);
 }
 
 .partner-form h3 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: #003366;
-    text-align: center;
+    margin-bottom: 18px;
+    color: var(--color-navy);
 }
 
-.partner-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+.partner-form form {
+    display: grid;
+    gap: 14px;
 }
 
 .partner-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+    margin-bottom: 0;
 }
 
 .partner-form button {
     width: 100%;
-    padding: 10px;
-    background-color: #003366;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
+    margin-top: 4px;
 }
 
-.partner-form button:hover {
-    background-color: #002244;
-}
-
-/* Mobile Fix */
-@media (max-width: 768px) {
-    .main-content {
-        flex-direction: column;
-        align-items: center;
+@media (max-width: 960px) {
+    body > .main-content {
+        grid-template-columns: 1fr;
+        width: min(100% - 28px, 1240px);
+        margin-top: 24px;
     }
 
-    .left-column {
-        width: 100%;
-        margin-right: 0;
-    }
-
-    .partner-form-container {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .nav {
+    .partner-form {
         position: static;
-        justify-content: center;
-        margin-top: 10px;
     }
 }

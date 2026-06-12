@@ -66,9 +66,9 @@ include __DIR__ . '/../../includes/sidebar.php';
             <input type="hidden" name="csrf_token" value="<?php echo e(app_csrf_token()); ?>">
 
             <label for="otp_code">OTP Code:</label>
-            <input type="text" id="otp_code" name="otp_code" inputmode="numeric" autocomplete="one-time-code" required style="padding:10px; border:1px solid #ccc; border-radius:4px;">
+            <input type="text" id="otp_code" name="otp_code" inputmode="numeric" autocomplete="one-time-code" required>
 
-            <button type="submit" class="button" style="margin-top:15px;">Verify</button>
+            <button type="submit" class="button">Verify</button>
         </form>
     </div>
 </div>

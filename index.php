@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/includes/bootstrap.php';
 
 // Implement basic security headers
 header("Content-Security-Policy: default-src 'self' data: https:;");
@@ -7,14 +7,12 @@ header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: SAMEORIGIN");
 header("X-XSS-Protection: 1; mode=block");
 
-// Ensure secure session cookies
-if (session_status() === PHP_SESSION_ACTIVE) {
-    ini_set('session.cookie_httponly', 1);
-    ini_set('session.cookie_secure', 1);
-}
-
 // Process the partner application form submission from index.php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['app_name'])) {
+    if (!app_verify_csrf($_POST['csrf_token'] ?? null)) {
+        die("Invalid CSRF token");
+    }
+
     // Map the submitted form fields to session variables
     $_SESSION['app_main_contact']       = trim($_POST['app_name']);   // Maps to Main Contact
     $_SESSION['app_company_name']       = trim($_POST['app_company']);  // Maps to Company Name
@@ -25,18 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['app_name'])) {
     header('Location: /apply_partner.php');
     exit;    
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partner with ImagineSoftware</title>
-    <link rel="stylesheet" href="assets/css/style2.css">
-</head>
-<body>
-    <?php include 'includes/header.php'; ?>
 
+$pageTitle = 'Partner with ImagineSoftware';
+$pageStylesheets = ['/assets/css/style2.css'];
+include __DIR__ . '/includes/header.php';
+?>
     <div class="main-content">
         <!-- Left Column: Slider and Content -->
         <div class="left-column">
@@ -104,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['app_name'])) {
             <div class="partner-form">
                 <h3>Start The Partner Application Process</h3>
                 <form method="POST" action="index.php">
+                    <input type="hidden" name="csrf_token" value="<?php echo e(app_csrf_token()); ?>">
+
                     <label for="app_name">Name:</label>
                     <input type="text" id="app_name" name="app_name" placeholder="Your Name" required>
 
@@ -122,8 +115,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['app_name'])) {
         </div>
     </div>
 
-    <?php include 'includes/footer.php'; ?>
-
-    <script src="assets/js/script01010101.js"></script>
-</body>
-</html>
+    <script src="/assets/js/script01010101.js"></script>
+    <?php include __DIR__ . '/includes/footer.php'; ?>

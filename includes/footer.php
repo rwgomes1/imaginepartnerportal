@@ -1,7 +1,9 @@
+<?php if (!empty($layoutHasSidebar)): ?>
 </main> <!-- close .main-content -->
 </div> <!-- close .dashboard-wrapper -->
+<?php endif; ?>
 
-<footer class="footer" style="position: fixed; bottom: 0; left: 0; width: 100%; z-index: 999;">
+<footer class="footer">
     Technology Partners, LLC d.b.a. ImagineSoftware™, © 2025 | All Rights Reserved
 </footer>
 
